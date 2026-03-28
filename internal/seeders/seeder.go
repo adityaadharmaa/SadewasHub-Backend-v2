@@ -52,6 +52,7 @@ func RunSeeder() {
 
 		adminUser = models.User{
 			ID:              uuid.New(),
+			Name:            "Super Admin",
 			Email:           adminEmail,
 			Password:        &passStr,
 			EmailVerifiedAt: &now,

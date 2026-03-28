@@ -13,6 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"gorm.io/gorm"
@@ -106,6 +107,7 @@ func GoogleCallback(c *gin.Context) {
 
 			user = models.User{
 				ID:              userID,
+				Name:            name,
 				Email:           email,
 				EmailVerifiedAt: &now,
 				SocialID:        &googleID,
@@ -182,6 +184,54 @@ func GoogleCallback(c *gin.Context) {
 			"email":   user.Email,
 			"name":    name,
 			"picture": picture,
+		},
+	})
+}
+
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+func Login(c *gin.Context) {
+	var req LoginRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Format email tidak valid atau password kosong"})
+		return
+	}
+
+	var user models.User
+
+	if err := config.DB.Where("email = ? ", req.Email).First(&user).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email atau password salah"})
+		return
+	}
+
+	if user.Password == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Akun ini terdaftar menggunakan Google. Silakan login via Google."})
+		return
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(*user.Password), []byte(req.Password))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email atau password salah"})
+		return
+	}
+
+	jwtToken, err := utils.GenerateToken(user.ID, user.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat token autentikasi"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Login berhasil",
+		"token":   jwtToken,
+		"user": gin.H{
+			"id":    user.ID,
+			"email": user.Email,
 		},
 	})
 }

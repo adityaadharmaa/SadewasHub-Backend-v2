@@ -5,6 +5,7 @@ import (
 	"os"
 	"sadewashub-go/internal/config"
 	"sadewashub-go/internal/controllers"
+	"sadewashub-go/internal/routes"
 	"sadewashub-go/internal/seeders"
 
 	"github.com/gin-gonic/gin"
@@ -25,18 +26,21 @@ func main() {
 
 	r := gin.Default()
 
-	r.GET("/api/v2/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":  "success",
-			"message": "Pong! API SadewasHub (GOLANG) sudah berjalan 🚀",
-		})
-	})
+	v2 := r.Group("/api/v2")
+	routes.SetupAuthRoutes(v2)
 
-	authGroup := r.Group("/api/v2/auth")
-	{
-		authGroup.GET("/google", controllers.GoogleLogin)
-		authGroup.GET("/google/callback", controllers.GoogleCallback)
-	}
+	// r.GET("/api/v2/ping", func(c *gin.Context) {
+	// 	c.JSON(200, gin.H{
+	// 		"status":  "success",
+	// 		"message": "Pong! API SadewasHub (GOLANG) sudah berjalan 🚀",
+	// 	})
+	// })
+
+	// authGroup := r.Group("/api/v2/auth")
+	// {
+	// 	authGroup.GET("/google", controllers.GoogleLogin)
+	// 	authGroup.GET("/google/callback", controllers.GoogleCallback)
+	// }
 
 	port := os.Getenv("PORT")
 	if port == "" {

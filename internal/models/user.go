@@ -9,6 +9,7 @@ import (
 
 type User struct {
 	ID              uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	Name            string         `gorm:"type:varchar(255);not null" json:"name"`
 	Email           string         `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
 	EmailVerifiedAt *time.Time     `json:"email_verified_at,omitempty"`
 	Password        *string        `gorm:"type:varchar(255)" json:"-"` // json:"-" agar tidak ikut terkirim ke frontend
