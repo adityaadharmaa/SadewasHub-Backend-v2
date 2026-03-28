@@ -21,6 +21,8 @@ type User struct {
 
 	// Relasi
 	Profile *UserProfile `gorm:"foreignKey:UserID" json:"profile,omitempty"`
+
+	Roles []Role `gorm:"many2many:model_has_roles;joinForeignKey:model_id;joinReferences:role_id" json:"roles,omitempty"`
 }
 
 type UserProfile struct {
@@ -50,6 +52,8 @@ type Role struct {
 	GuardName string    `gorm:"type:varchar(255);not null" json:"guard_name"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+
+	Permissions []Permission `gorm:"many2many:role_has_permissions;joinForeignKey:role_id;joinReferences:permission_id" json:"permissions,omitempty"`
 }
 
 type Permission struct {
@@ -58,4 +62,32 @@ type Permission struct {
 	GuardName string    `gorm:"type:varchar(255);not null" json:"guard_name"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type ModelHasRole struct {
+	// HAPUS tulisan ;primaryKey di ketiga baris ini 👇
+	RoleID    uuid.UUID `gorm:"type:char(36);column:role_id"`
+	ModelType string    `gorm:"type:varchar(255);column:model_type"`
+	ModelID   uuid.UUID `gorm:"type:char(36);column:model_id"`
+}
+
+func (ModelHasRole) TableName() string {
+	return "model_has_roles"
+}
+
+func (m *ModelHasRole) BeforeSave(tx *gorm.DB) (err error) {
+	if m.ModelType == "" {
+		m.ModelType = "App\\Models\\User"
+	}
+	return
+}
+
+type RoleHasPermission struct {
+	// HAPUS tulisan ;primaryKey di kedua baris ini 👇
+	PermissionID uuid.UUID `gorm:"type:char(36);column:permission_id"`
+	RoleID       uuid.UUID `gorm:"type:char(36);column:role_id"`
+}
+
+func (RoleHasPermission) TableName() string {
+	return "role_has_permissions"
 }

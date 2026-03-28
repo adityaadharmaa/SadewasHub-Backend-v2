@@ -1,1 +1,29 @@
+# --- Binaries & Build Results ---
+# Jangan pernah meng-upload file aplikasi yang sudah di-build (.exe / eksekusi Linux)
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+
+# --- Air (Live Reload) ---
+tmp/
+# File log dari Air
+build-errors.log
+
+# --- Kredensial & Rahasia ---
 .env
+.env.local
+.env.*.local
+
+# --- Dependency Golang (Opsional, tapi direkomendasikan) ---
+# Folder vendor tidak perlu diupload karena Go bisa mendownload ulang lewat go.mod
+vendor/
+
+# --- IDEs & OS Files ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

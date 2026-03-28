@@ -32,7 +32,7 @@ func GenerateToken(userID uuid.UUID, email string) (string, error) {
 }
 
 func ValidateToken(tokenString string) (*JwtCustomClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{}, func(token *jwt) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
 

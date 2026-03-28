@@ -19,6 +19,9 @@ func ConnectionDatabase() {
 		log.Fatal("Gagal terhubung ke database:", err)
 	}
 
+	database.SetupJoinTable(&models.User{}, "Roles", &models.ModelHasRole{})
+	database.SetupJoinTable(&models.Role{}, "Permissions", &models.RoleHasPermission{})
+
 	err = database.AutoMigrate(
 		&models.User{},
 		&models.UserProfile{},

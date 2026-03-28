@@ -5,6 +5,7 @@ import (
 	"os"
 	"sadewashub-go/internal/config"
 	"sadewashub-go/internal/controllers"
+	"sadewashub-go/internal/seeders"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -17,6 +18,8 @@ func main() {
 	}
 
 	config.ConnectionDatabase()
+
+	seeders.RunSeeder()
 
 	controllers.InitOAuth()
 
